@@ -6,6 +6,10 @@ from typing import List
 from dotenv import load_dotenv
 from tavily import TavilyClient
 from openai import OpenAI
+import logging
+
+# Configure basic logging (optional, but good practice for simple cases)
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 # --- Import custom modules ---
 try:
@@ -118,13 +122,18 @@ def generate_market_research(selected_sdgs, idea, problem_statement, target_mark
     web_summary, source_urls = "Web search was not performed as Tavily API key is not configured.", []
     if tavily_client:
         search_query = f"{research_question} for {target_market} related to SDGs: {', '.join(selected_sdgs)}"
-        try:
-            with st.spinner("Searching the web..."):
-                tavily_result = tavily_client.search(query=search_query, include_answer=True, include_sources=True, search_depth="basic")
-                web_summary = tavily_result.get("answer", "No summary could be generated.")
-                source_urls = [src.get('url', '') for src in tavily_result.get("sources", []) if src.get('url')]
-        except Exception as e:
-            st.warning(f"Web search failed: {e}."); web_summary = "Web search unavailable."
+        if len(search_query) > 400:
+            logging.warning("Search query is too long, truncating to 400 characters.")
+            st.warning("Search query is too long, truncating to 400 characters.")
+        else :
+            search_query = search_query[:400]
+            try:
+                with st.spinner("Searching the web..."):
+                    tavily_result = tavily_client.search(query=search_query, include_answer=True, include_sources=True, search_depth="basic")
+                    web_summary = tavily_result.get("answer", "No summary could be generated.")
+                    source_urls = [src.get('url', '') for src in tavily_result.get("sources", []) if src.get('url')]
+            except Exception as e:
+                st.warning(f"Web search failed: {e}."); web_summary = "Web search unavailable."
     system_prompt = "You are a market research analyst helping a student."
     user_prompt = f"Web Research Summary:\n{web_summary}\n\nProject Details:\n- SDGs: {', '.join(selected_sdgs)}\n- Idea: {idea}\n- Problem: {problem_statement}\n- Target Market: {target_market}\n- Question: {research_question}\n\nProvide a structured report covering: Market Size, Customer Analysis, Competition, Entry Strategy, and Challenges."
     with st.spinner("Analyzing market data..."):
