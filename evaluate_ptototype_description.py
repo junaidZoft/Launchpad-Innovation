@@ -1,7 +1,7 @@
 """
-Market Fit Evaluator - Optimized Groq Version
+Problem Statement Classifier - Optimized Groq Version
 
-A high-performance evaluator for assessing market fit of student projects using Groq API.
+A high-performance classifier for evaluating student problem statements using Groq API.
 Optimized for speed with comprehensive error handling, caching, and batch processing.
 """
 
@@ -55,13 +55,11 @@ class ValidationError(ClassificationError):
 
 
 @dataclass
-class MarketFitResult:
-    """Structured result from market fit evaluation."""
+class ClassificationResult:
+    """Structured result from classification."""
     success: bool
-    market_potential: Optional[str] = None
-    customer_validation: Optional[str] = None
-    business_viability: Optional[str] = None
-    competitive_advantage: Optional[str] = None
+    x_axis_category: Optional[str] = None
+    y_axis_category: Optional[str] = None
     error: Optional[str] = None
     raw_response: Optional[str] = None
     processing_time: Optional[float] = None
@@ -108,7 +106,7 @@ class OptimizedProblemStatementClassifier:
         "gemma-7b-it",          # Lightweight
     ]
     
-    def _init_(
+    def __init__(
         self,
         api_key: Optional[str] = None,
         model_name: str = "llama3-70b-8192",  # Default to fastest model
@@ -202,56 +200,56 @@ You must classify each problem statement using TWO dimensions:
 ## Output Requirements
 Your response MUST be a single, valid JSON object with this EXACT structure:
 
-json
+```json
 {{
   "X_Axis_Rubric_Category": "<single string from X-axis categories>",
   "Y_Axis_Rubric_Category": "<single string from Y-axis categories>"
 }}
-
+```
 
 ## Assessment Process for Problem Statement Evaluation
 
 ### Step 1: Content Analysis (Y-Axis)
 Carefully examine the problem statement to determine which of the following elements are clearly present. Select the ONE Y-axis category that includes all the identifiable elements:
 
-*Contains Data*: Includes relevant quantitative or qualitative data supporting the existence of the problem.
+**Contains Data**: Includes relevant quantitative or qualitative data supporting the existence of the problem.
 
-*References Included*: Cites any sources or references.
+**References Included**: Cites any sources or references.
 
-*Location/Area Clear*: Clearly specifies the geographical location or specific area affected.
+**Location/Area Clear**: Clearly specifies the geographical location or specific area affected.
 
-*Target Audience Clearly Stated*: Defines the specific group or demographic impacted by the issue.
+**Target Audience Clearly Stated**: Defines the specific group or demographic impacted by the issue.
 
-*Impact Described*: Explains the consequences or negative outcomes if the problem remains unaddressed.
+**Impact Described**: Explains the consequences or negative outcomes if the problem remains unaddressed.
 
 ✔ Choose the category that matches all the elements present in the problem statement.
 
 ### Step 2: Quality Analysis (X-Axis) - ENHANCED WITH IDEA RELEVANCE
 Evaluate the overall quality of the problem statement based on these five dimensions, with special attention to how well it aligns with the provided idea. Select the ONE best matching X-axis category based on how many of these are fully demonstrated:
 
-*GRAMMAR*: Uses correct grammar, punctuation, spelling, sentence structure, and appropriate vocabulary throughout.
+**GRAMMAR**: Uses correct grammar, punctuation, spelling, sentence structure, and appropriate vocabulary throughout.
 
-*DEMONSTRATES UNDERSTANDING*: Shows insight and clear comprehension of the topic and SDG concept.
+**DEMONSTRATES UNDERSTANDING**: Shows insight and clear comprehension of the topic and SDG concept.
 
-*PRECISE AND TO THE POINT*: Avoids unnecessary detail and focuses on the core message without redundancy.
+**PRECISE AND TO THE POINT**: Avoids unnecessary detail and focuses on the core message without redundancy.
 
-*RELEVANT TO THE IDEA*: Content clearly supports and aligns with the provided idea. The problem statement should logically connect to the idea as a potential solution or approach. If the problem statement is not relevant to the idea, this dimension is automatically NOT met.
+**RELEVANT TO THE IDEA**: Content clearly supports and aligns with the provided idea. The problem statement should logically connect to the idea as a potential solution or approach. If the problem statement is not relevant to the idea, this dimension is automatically NOT met.
 
-*INFO IS WELL-STRUCTURED AND EASY TO UNDERSTAND*: Logical organization, clear flow, and easily comprehensible to readers.
+**INFO IS WELL-STRUCTURED AND EASY TO UNDERSTAND**: Logical organization, clear flow, and easily comprehensible to readers.
 
 ✔ Choose the category that best reflects the overall writing quality and clarity based on the above dimensions, giving special weight to idea relevance.
 
 ### Critical Assessment Guidelines
 
-*Idea Relevance Evaluation (Critical for X-Axis)*:
+**Idea Relevance Evaluation (Critical for X-Axis)**:
 - Does the problem statement address the same issue that the idea is trying to solve?
 - Are the problem statement and idea focused on the same or related SDG themes?
 - Would the provided idea logically contribute to solving the stated problem?
 - Is there thematic alignment between the problem context and the idea's scope?
 
-*If the problem statement is NOT relevant to the provided idea*, the X-axis score should reflect this by selecting categories that include "Is not Relevant to the Idea" or lower quality combinations.
+**If the problem statement is NOT relevant to the provided idea**, the X-axis score should reflect this by selecting categories that include "Is not Relevant to the Idea" or lower quality combinations.
 
-*Grammar Assessment (Enhanced)*:
+**Grammar Assessment (Enhanced)**:
 Pay special attention to:
 - Subject-verb agreement errors
 - Incorrect tense usage
@@ -263,91 +261,66 @@ Pay special attention to:
 
 ## Critical Guidelines for Consistency
 
-1. *Age-Appropriate Expectations*: Remember these are 14-16 year old students. Apply standards appropriate for this developmental level.
+1. **Age-Appropriate Expectations**: Remember these are 14-16 year old students. Apply standards appropriate for this developmental level.
 
-2. *Objective Analysis*: Base your assessment solely on what is explicitly present in the text, not on implied or inferred meanings.
+2. **Objective Analysis**: Base your assessment solely on what is explicitly present in the text, not on implied or inferred meanings.
 
-3. *Consistent Criteria*: Use the same evaluation standards for every assessment. Apply consistent thresholds for grammar, understanding, precision, relevance to idea, and structure.
+3. **Consistent Criteria**: Use the same evaluation standards for every assessment. Apply consistent thresholds for grammar, understanding, precision, relevance to idea, and structure.
 
-4. *Complete Analysis*: Examine ALL aspects thoroughly before making your final classification.
+4. **Complete Analysis**: Examine ALL aspects thoroughly before making your final classification.
 
-5. *Reproducible Results*: Your assessment of identical content must be identical every time, regardless of when the evaluation occurs.
+5. **Reproducible Results**: Your assessment of identical content must be identical every time, regardless of when the evaluation occurs.
 
-6. *Idea Relevance Priority*: If the problem statement does not align with the provided idea, this significantly impacts the X-axis quality score.
+6. **Idea Relevance Priority**: If the problem statement does not align with the provided idea, this significantly impacts the X-axis quality score.
 
 ## Valid Categories for Output
 
 ### X-AXIS CATEGORIES (Quality Assessment)
 
-*Lowest Quality Level:*
-- "Target Audience Alignment only"
-- "Problem-Solution Alignment only"
-- "Customer Validation Evidence only"
-- "Unique Value Proposition only"
-- "Outlines initial steps for entering the market only"
-
-*Combined Low Quality:*
-- "Target Audience Alignment + Problem-Solution Alignment"
-- "Target Audience Alignment + Customer Validation Evidence"
-- "Target Audience Alignment + Unique Value Proposition"
-- "Target Audience Alignment + Outlines initial steps"
-- "Problem-Solution Alignment + Customer Validation Evidence"
-- "Problem-Solution Alignment + Unique Value Proposition"
-- "Problem-Solution Alignment + Outlines initial steps"
-- "Customer Validation Evidence + Unique Value Proposition"
-- "Customer Validation Evidence + Outlines initial steps"
-- "Unique Value Proposition + Outlines initial steps"
-
-*Triple and Quadruple Low Quality Combinations:*
-- "Target Audience Alignment + Problem-Solution Alignment + Outlines initial steps"
-- "Target Audience Alignment + Customer Validation Evidence + Unique Value Proposition"
-- "Target Audience Alignment + Customer Validation Evidence + Outlines initial steps"
-- "Target Audience Alignment + Unique Value Proposition + Outlines initial steps"
-- "Problem-Solution Alignment + Customer Validation Evidence + Unique Value Proposition"
-- "Problem-Solution Alignment + Customer Validation Evidence + Outlines initial steps"
-- "Problem-Solution Alignment + Unique Value Proposition + Outlines initial steps"
-- "Customer Validation Evidence + Unique Value Proposition + Outlines initial steps"
-
-*Medium Quality Level:*
-- "Target Audience Alignment + Problem-Solution Alignment + Customer Validation Evidence + Unique Value Proposition"
-- "Target Audience Alignment + Problem-Solution Alignment + Customer Validation Evidence + Outlines initial steps"
-- "Target Audience Alignment + Problem-Solution Alignment + Unique Value Proposition + Outlines initial steps"
-- "Target Audience Alignment + Customer Validation Evidence + Unique Value Proposition + Outlines initial steps"
-- "Problem-Solution Alignment + Customer Validation Evidence + Unique Value Proposition + Outlines initial steps"
-
-*Combined High Quality:*
-- "Target Audience Alignment + Problem-Solution Alignment + Customer Validation Evidence + Unique Value Proposition + Outlines initial steps"
-- "Target Audience Alignment + Problem-Solution Alignment + Customer Validation EvidenceTarget Audience Alignment + Problem-Solution Alignment + Unique Value Proposition"
-
-*Exceptional case:*
-- "not Relevant content to the Idea"
-
-### Y-AXIS CATEGORIES (Content Elements)
-
-*Single Elements:*
+**Lowest Quality Level:**
 - "Relevant to the Idea Only"
 - "Does not have grammar"
 - "Does not Demonstrate Understanding Only"
 - "Is not Precise and To the Point"
 - "Info is not Well-Structured and Is not Easy to Understand"
-- "Has some grammar"
-- "Demonstrates some Understanding"
-- "Is somewhat Precise and To the Point"
-- "Info is somewhat Well-Structured and fairly Easy to Understand"
 
-*Two Element Combinations:*
-- "Does not have Grammar + Does not Demonstrate Understanding" 
+**Combined Low Quality:**
+- "Does not have Grammar + Does not Demonstrate Understanding"
 - "Does not have Grammar + Is not Precise and To the Point"
 - "Does not have Grammar + Info is not Well-Structured and Is not Easy to Understand"
 - "Does not Demonstrate Understanding + Info is not Well-Structured and Is not Easy to Understand"
 - "Does not Demonstrate Understanding + Is not Precise and To the Point"
 - "Is not Precise and To the Point + Info is not Well-Structured and Is not Easy to Understand"
+
+**Triple and Quadruple Low Quality Combinations:**
+- "Does not have Grammar + Does not Demonstrate Understanding + Is not Precise and To the Point"
+- "Does not have Grammar + Does not Demonstrate Understanding + Info is not Well-Structured and Is not Easy to Understand"
+- "Does not have Grammar + Is not Precise and To the Point + Info is not Well-Structured and Is not Easy to Understand"
+- "Does not Demonstrate Understanding + Is not Precise and To the Point + Info is not Well-Structured and Is not Easy to Understand"
+- "Does not have Grammar + Does not Demonstrate Understanding + Is not Precise and To the Point + Info is not Well-Structured and Is not Easy to Understand"
+
+**Medium Quality Level:**
+- "Has some grammar"
+- "Demonstrates some Understanding"
+- "Is somewhat Precise and To the Point"
+- "Info is somewhat Well-Structured and fairly Easy to Understand"
+
+**Combined Medium Quality:**
 - "Has some Grammar + Demonstrates some Understanding"
 - "Has some Grammar + is somewhat Precise and To the Point"
 - "Has some Grammar + Info is somewhat Well-Structured and fairly Easy to Understand"
 - "Demonstrates some Understanding + Info is somewhat Well-Structured and fairly Easy to Understand"
 - "Demonstrates some Understanding + is somewhat Precise and To the Point"
 - "Is somewhat Precise and To the Point + Info is somewhat Well-Structured and is somewhat Easy to Understand"
+
+**Triple and Quadruple Medium Quality Combinations:**
+- "Has some Grammar + Demonstrates some Understanding + is somewhat Precise and To the Point"
+- "Has some Grammar + Demonstrates some Understanding + Info is somewhat Well-Structured and somewhat Easy to Understand"
+- "Has some Grammar + is somewhat Precise and To the Point + Info is somewhat Well-Structured and is somewhat Easy to Understand"
+- "Demonstrates some Understanding + is somewhat Precise and To the Point + Info is somewhat Well-Structured and is somewhat Easy to Understand"
+- "Has some Grammar + Demonstrates some Understanding + is somewhat Precise and To the Point + Info is somewhat Well-Structured and somewhat Easy to Understand"
+
+**High Quality Level:**
 - "Has Very good Grammar + Demonstrates Very good Understanding"
 - "Has Very good Grammar + Is Precise and To the Point"
 - "Has Very good Grammar + Info is Well-Structured and Easy to Understand"
@@ -355,57 +328,86 @@ Pay special attention to:
 - "Demonstrates Very Good Understanding + Info is Very Well-Structured and Easy to Understand"
 - "Is Precise and To the Point + Info is Very Well-Structured and Easy to Understand"
 
-*Three Element Combinations:*
-- "Does not have Grammar + Does not Demonstrate Understanding + Is not Precise and To the Point"
-- "Does not have Grammar + Does not Demonstrate Understanding + Info is not Well-Structured and Is not Easy to Understand"
-- "Does not have Grammar + Is not Precise and To the Point + Info is not Well-Structured and Is not Easy to Understand"
-- "Does not Demonstrate Understanding + Is not Precise and To the Point + Info is not Well-Structured and Is not Easy to Understand"
-- "Does not have Grammar + Does not Demonstrate Understanding + Is not Precise and To the Point + Info is not Well-Structured and Is not Easy to Understand"
-- "Has some Grammar + Demonstrates some Understanding + is somewhat Precise and To the Point"
-- "Has some Grammar + Demonstrates some Understanding + Info is somewhat Well-Structured and somewhat Easy to Understand"
-- "Has some Grammar + is somewhat Precise and To the Point + Info is somewhat Well-Structured and is somewhat Easy to Understand"
-- "Demonstrates some Understanding + is somewhat Precise and To the Point + Info is somewhat Well-Structured and is somewhat Easy to Understand"
-- "Has some Grammar + Demonstrates some Understanding + is somewhat Precise and To the Point + Info is somewhat Well-Structured and somewhat Easy to Understand"
+**Combined High Quality:**
 - "Has very good Grammar + Demonstrates Very Good Understanding + Is Precise and To the Point"
 - "Has Very Good Grammar + Demonstrates Very Good Understanding + Info is Very Well-Structured and Easy to Understand"
 - "Has Very Good Grammar + Is Precise and To the Point + Info is Very Well-Structured and Easy to Understand"
 - "Demonstrates Very Good Understanding + Is Precise and To the Point + Info is Very Well-Structured and Easy to Understand"
-
-*Four and Five Element Combinations:*
 - "Has Very Good Grammar + Demonstrates Very Good Understanding + Is Precise and To the Point + Info is Very Well-Structured and Easy to Understand"
 
-*Exceptional case:*
+**Exceptional case:**
+- "not Relevant content to the Idea"
+
+### Y-AXIS CATEGORIES (Content Elements)
+
+**Single Elements:**
+- "Contains Data Only"
+- "References Included Only"
+- "Location/Area Clear Only"
+- "Target Audience Clearly Stated Only"
+- "Impact Described Only"
+
+**Two Element Combinations:**
+- "Contains Data + References Included"
+- "Contains Data + Location/Area Clear"
+- "Contains Data + Target Audience Clearly Stated"
+- "Contains Data + Impact Described"
+- "References Included + Location/Area Clear"
+- "References Included + Target Audience Clearly Stated"
+- "References Included + Impact Described"
+- "Location/Area Clear + Target Audience Clearly Stated"
+- "Location/Area Clear + Impact Described"
+- "Target Audience Clearly Stated + Impact Described"
+
+**Three Element Combinations:**
+- "Contains Data + References Included + Location/Area Clear"
+- "Contains Data + References Included + Target Audience Clearly Stated"
+- "Contains Data + References Included + Impact Described"
+- "Contains Data + Location/Area Clear + Target Audience Clearly Stated"
+- "Contains Data + Location/Area Clear + Impact Described"
+- "Contains Data + Target Audience Clearly Stated + Impact Described"
+- "References Included + Location/Area Clear + Target Audience Clearly Stated"
+- "References Included + Location/Area Clear + Impact Described"
+- "References Included + Target Audience Clearly Stated + Impact Described"
+
+**Four and Five Element Combinations:**
+- "Contains Data + References Included + Location/Area Clear + Target Audience Clearly Stated"
+- "Contains Data + References Included + Location/Area Clear + Impact Described"
+- "Contains Data + References Included + Target Audience Clearly Stated + Impact Described"
+- "Contains Data + References Included + Location/Area Clear + Target Audience Clearly Stated + Impact Described"
+
+**Exceptional case:**
 - "not Relevant content to the Idea"
 
 ---
 
-Now analyze the following market fit description:
+Now analyze the following student submission:
 
-{market_fit_description}
+**IDEA PROVIDED:**
+{idea_text}
 
-Evaluate the market fit based on these key aspects:
-1. Market Potential (size, growth, trends)
-2. Customer Validation (evidence of demand, user feedback)
-3. Business Viability (revenue model, cost structure)
-4. Competitive Advantage (unique selling points, barriers to entry)
+**PROBLEM STATEMENT TO EVALUATE:**
+{problem_statement_text}
 
-Provide ONLY a JSON output with the following structure:
-{
-    "market_potential": "<high|medium|low> - Brief justification",
-    "customer_validation": "<strong|moderate|weak> - Brief justification",
-    "business_viability": "<viable|uncertain|challenging> - Brief justification",
-    "competitive_advantage": "<strong|moderate|weak> - Brief justification"
-}
+Carefully assess the problem statement's quality and content elements. Pay special attention to whether the problem statement is relevant to the provided idea. If they are not aligned or relevant to each other, this should significantly impact the X-axis quality score.
+
+Provide ONLY the JSON output with the two required categories.
 '''
     
-    def _validate_inputs(self, market_fit_description: str) -> None:
+    def _validate_inputs(self, idea_text: str, problem_statement_text: str) -> None:
         """Validate input parameters with optimized checks."""
-        if not market_fit_description or not isinstance(market_fit_description, str) or len(market_fit_description.strip()) < 50:
-            raise ValidationError("market_fit_description must be a non-empty string with at least 50 characters")
+        if not idea_text or not isinstance(idea_text, str) or len(idea_text.strip()) < 10:
+            raise ValidationError("idea_text must be a non-empty string with at least 10 characters")
         
-        # Quick length check
-        if len(market_fit_description) > 8000:
-            raise ValidationError("market_fit_description exceeds maximum length of 8000 characters")
+        if not problem_statement_text or not isinstance(problem_statement_text, str) or len(problem_statement_text.strip()) < 20:
+            raise ValidationError("problem_statement_text must be a non-empty string with at least 20 characters")
+        
+        # Quick length checks
+        if len(idea_text) > 3000:
+            raise ValidationError("idea_text exceeds maximum length of 3000 characters")
+        
+        if len(problem_statement_text) > 8000:
+            raise ValidationError("problem_statement_text exceeds maximum length of 8000 characters")
     
     def _sanitize_text(self, text: str) -> str:
         """Fast text sanitization."""
@@ -423,7 +425,7 @@ Provide ONLY a JSON output with the following structure:
         
         return (time.time() - self._cache_timestamps[cache_key]) < self.cache_ttl
     
-    def _get_cached_result(self, cache_key: str) -> Optional[MarketFitResult]:
+    def _get_cached_result(self, cache_key: str) -> Optional[ClassificationResult]:
         """Get cached result with TTL check."""
         if not self.enable_caching or cache_key not in self._cache:
             self.metrics['cache_misses'] += 1
@@ -439,7 +441,7 @@ Provide ONLY a JSON output with the following structure:
         self.metrics['cache_hits'] += 1
         return self._cache[cache_key]
     
-    def _cache_result(self, cache_key: str, result: MarketFitResult) -> None:
+    def _cache_result(self, cache_key: str, result: ClassificationResult) -> None:
         """Cache result with TTL."""
         if not self.enable_caching:
             return
@@ -461,9 +463,9 @@ Provide ONLY a JSON output with the following structure:
             text = response_text.strip()
             
             # Remove markdown formatting
-            if text.startswith('json'):
+            if text.startswith('```json'):
                 text = text[7:]
-            if text.endswith(''):
+            if text.endswith('```'):
                 text = text[:-3]
             text = text.strip()
             
@@ -544,7 +546,7 @@ Provide ONLY a JSON output with the following structure:
         except Exception as e:
             raise APIError(f"Groq API call failed: {str(e)}")
     
-    async def evaluate_market_fit_async(self, market_fit_description: str) -> MarketFitResult:
+    async def classify_async(self, idea_text: str, problem_statement_text: str) -> ClassificationResult:
         """Async classification method for maximum speed."""
         start_time = time.time()
         self.metrics['total_requests'] += 1
@@ -579,12 +581,10 @@ Provide ONLY a JSON output with the following structure:
                     if success:
                         processing_time = time.time() - start_time
                         
-                        result = MarketFitResult(
+                        result = ClassificationResult(
                             success=True,
-                            market_potential=parsed_data['market_potential'],
-                            customer_validation=parsed_data['customer_validation'],
-                            business_viability=parsed_data['business_viability'],
-                            competitive_advantage=parsed_data['competitive_advantage'],
+                            x_axis_category=parsed_data['X_Axis_Rubric_Category'],
+                            y_axis_category=parsed_data['Y_Axis_Rubric_Category'],
                             raw_response=response_text,
                             processing_time=processing_time,
                             tokens_used=usage_info.get('total_tokens', 0),
@@ -610,7 +610,7 @@ Provide ONLY a JSON output with the following structure:
             processing_time = time.time() - start_time
             self._update_metrics(processing_time, 0, False)
             
-            return MarketFitResult(
+            return ClassificationResult(
                 success=False,
                 error=f"Failed after {self.max_retries} attempts: {str(last_error)}",
                 processing_time=processing_time
@@ -620,35 +620,35 @@ Provide ONLY a JSON output with the following structure:
             processing_time = time.time() - start_time
             self._update_metrics(processing_time, 0, False)
             
-            return MarketFitResult(
+            return ClassificationResult(
                 success=False,
                 error=str(e),
                 processing_time=processing_time
             )
     
-    def evaluate_market_fit_sync(self, market_fit_description: str) -> MarketFitResult:
-        """Synchronous market fit evaluation method."""
-        return asyncio.run(self.evaluate_market_fit_async(market_fit_description))
+    def classify_sync(self, idea_text: str, problem_statement_text: str) -> ClassificationResult:
+        """Synchronous classification method."""
+        return asyncio.run(self.classify_async(idea_text, problem_statement_text))
     
     # Alias for backwards compatibility
-    def evaluate_market_fit(self, market_fit_description: str) -> MarketFitResult:
-        """Main market fit evaluation method."""
-        return self.evaluate_market_fit_sync(market_fit_description)
+    def classify_problem_statement(self, idea_text: str, problem_statement_text: str) -> ClassificationResult:
+        """Main classification method (backwards compatible)."""
+        return self.classify_sync(idea_text, problem_statement_text)
     
-    async def evaluate_batch_async(self, descriptions: List[str]) -> List[MarketFitResult]:
-        """High-speed batch evaluation."""
+    async def classify_batch_async(self, requests: List[Tuple[str, str]]) -> List[ClassificationResult]:
+        """High-speed batch classification."""
         semaphore = asyncio.Semaphore(self.max_concurrent)
         
-        async def evaluate_single(description: str) -> MarketFitResult:
+        async def classify_single(idea: str, problem: str) -> ClassificationResult:
             async with semaphore:
-                return await self.evaluate_market_fit_async(description)
+                return await self.classify_async(idea, problem)
         
-        tasks = [evaluate_single(desc) for desc in descriptions]
+        tasks = [classify_single(idea, problem) for idea, problem in requests]
         return await asyncio.gather(*tasks, return_exceptions=False)
     
-    def evaluate_batch_sync(self, descriptions: List[str]) -> List[MarketFitResult]:
-        """Synchronous batch evaluation."""
-        return asyncio.run(self.evaluate_batch_async(descriptions))
+    def classify_batch_sync(self, requests: List[Tuple[str, str]]) -> List[ClassificationResult]:
+        """Synchronous batch classification."""
+        return asyncio.run(self.classify_batch_async(requests))
     
     def _update_metrics(self, processing_time: float, tokens: int, success: bool) -> None:
         """Update performance metrics."""
@@ -717,7 +717,7 @@ Provide ONLY a JSON output with the following structure:
         self._cache_timestamps.clear()
         self.logger.info("Cache cleared")
     
-    def _del_(self):
+    def __del__(self):
         """Cleanup resources."""
         if hasattr(self, 'executor'):
             self.executor.shutdown(wait=False)
@@ -809,7 +809,7 @@ async def run_comprehensive_test():
     batch_results = await classifier.classify_batch_async(batch_requests)
     batch_time = time.time() - batch_start
     
-    print(f"⏱  Total batch time: {batch_time:.3f}s")
+    print(f"⏱️  Total batch time: {batch_time:.3f}s")
     print(f"📊 Results:")
     
     for i, result in enumerate(batch_results):
@@ -879,7 +879,7 @@ def sync_test():
         print(f"❌ Sync test error: {e}")
 
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     print("Choose test mode:")
     print("1. Async comprehensive test (recommended)")
     print("2. Quick sync test")
